@@ -4,6 +4,10 @@
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 const WHITE_PITCH_CLASSES = new Set([0, 2, 4, 5, 7, 9, 11]); // C D E F G A B
 
+// Global slow-down applied to every bundled/imported song's timeline, so
+// practicing feels less rushed. 2 = twice as long / half the effective tempo.
+export const DURATION_SCALE = 2;
+
 export function isBlackKey(midi: number): boolean {
   return !WHITE_PITCH_CLASSES.has(((midi % 12) + 12) % 12);
 }

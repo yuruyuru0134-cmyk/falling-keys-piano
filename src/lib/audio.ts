@@ -9,6 +9,7 @@ type Voice = {
 };
 
 const HARMONIC_GAINS = [1, 0.55, 0.3, 0.18, 0.1, 0.06];
+const NATURAL_DECAY_SECONDS = 6.5;
 
 export class PianoAudioEngine {
   private ctx: AudioContext | null = null;
@@ -45,8 +46,14 @@ export class PianoAudioEngine {
     const voiceGain = ctx.createGain();
     voiceGain.gain.setValueAtTime(0, now);
     const peak = 0.22 * velocity;
+    const sustain = peak * 0.35;
     voiceGain.gain.linearRampToValueAtTime(peak, now + 0.008);
-    voiceGain.gain.exponentialRampToValueAtTime(Math.max(peak * 0.25, 0.0001), now + 0.9);
+    voiceGain.gain.exponentialRampToValueAtTime(Math.max(sustain, 0.0001), now + 0.35);
+    // Like a real piano string, the note keeps fading even while the key is
+    // still "held" - this guarantees it reaches silence on its own within a
+    // few seconds even if a noteOff event is ever lost (e.g. a dropped
+    // pointerup on a flaky touchscreen), instead of droning forever.
+    voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + NATURAL_DECAY_SECONDS);
     voiceGain.connect(this.master!);
 
     const oscillators: OscillatorNode[] = [];
@@ -59,6 +66,9 @@ export class PianoAudioEngine {
       osc.connect(partialGain);
       partialGain.connect(voiceGain);
       osc.start(now);
+      // Safety net: stop the oscillator on its own even if noteOff() is
+      // never called for this voice.
+      osc.stop(now + NATURAL_DECAY_SECONDS + 0.1);
       oscillators.push(osc);
     });
 

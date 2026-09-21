@@ -1,5 +1,6 @@
 import { Midi } from "@tonejs/midi";
 import type { Song, NoteEvent } from "./songs";
+import { DURATION_SCALE } from "./theory";
 
 /**
  * Parses a standard MIDI file (picked up from any site the user has the
@@ -14,7 +15,11 @@ export async function songFromMidiFile(file: File): Promise<Song> {
   const allNotes: NoteEvent[] = [];
   for (const track of midi.tracks) {
     for (const n of track.notes) {
-      allNotes.push({ midi: n.midi, time: n.time, duration: Math.max(n.duration, 0.08) });
+      allNotes.push({
+        midi: n.midi,
+        time: n.time * DURATION_SCALE,
+        duration: Math.max(n.duration, 0.08) * DURATION_SCALE,
+      });
     }
   }
 
@@ -28,7 +33,7 @@ export async function songFromMidiFile(file: File): Promise<Song> {
   // "melody", the rest becomes "harmony".
   const melody: NoteEvent[] = [];
   const harmony: NoteEvent[] = [];
-  const WINDOW = 0.06;
+  const WINDOW = 0.06 * DURATION_SCALE;
   let i = 0;
   while (i < allNotes.length) {
     let j = i;
@@ -47,7 +52,7 @@ export async function songFromMidiFile(file: File): Promise<Song> {
   const low = Math.min(...allNotes.map((n) => n.midi));
   const high = Math.max(...allNotes.map((n) => n.midi));
   const lengthSeconds = Math.max(...allNotes.map((n) => n.time + n.duration)) + 1.5;
-  const bpm = midi.header.tempos[0]?.bpm ?? 100;
+  const bpm = (midi.header.tempos[0]?.bpm ?? 100) / DURATION_SCALE;
 
   const name = file.name.replace(/\.midi?$/i, "");
   return {

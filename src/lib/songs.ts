@@ -1,4 +1,4 @@
-import { nameToMidi } from "./theory";
+import { nameToMidi, DURATION_SCALE } from "./theory";
 
 export type NoteEvent = { midi: number; time: number; duration: number };
 
@@ -45,7 +45,7 @@ function buildSong(
   melodyStr: string,
   harmonyStr = ""
 ): Song {
-  const beatSec = 60 / bpm;
+  const beatSec = (60 / bpm) * DURATION_SCALE;
   const { events: melody, end: melodyEnd } = parseLine(melodyStr, beatSec);
   const { events: harmony, end: harmonyEnd } = parseLine(harmonyStr, beatSec);
   const all = [...melody, ...harmony];
@@ -154,6 +154,37 @@ export const SONGS: Song[] = [
       "A4:1 R:0.5 C4:0.5 E4:0.5 A4:0.5 B4:1 R:0.5",
     "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 " +
       "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 A2:2 E3:2"
+  ),
+  buildSong(
+    "canon-in-d",
+    "Canon in D",
+    "パッヘルベル・PD",
+    88,
+    "F#4:1 E4:1 D4:1 C#4:1 B3:1 A3:1 B3:1 C#4:1 " +
+      "D4:1 C#4:1 B3:1 A3:1 G3:1 F#3:1 G3:1 A3:1 " +
+      "F#4:1 E4:1 D4:1 C#4:1 B3:1 A3:1 B3:1 C#4:1 " +
+      "D4:1 C#4:1 B3:1 A3:1 G3:1 F#3:1 G3:1 A3:1",
+    "D3:2 A2:2 B2:2 F#2:2 G2:2 D2:2 G2:2 A2:2 " +
+      "D3:2 A2:2 B2:2 F#2:2 G2:2 D2:2 G2:2 A2:2"
+  ),
+  buildSong(
+    "fate-motif",
+    "交響曲第5番「運命」冒頭",
+    "ベートーヴェン・PD",
+    100,
+    "G4:0.5 G4:0.5 G4:0.5 D#4:3 R:0.5 F4:0.5 F4:0.5 F4:0.5 D4:3",
+    "G2:4 R:4 F2:4 R:4"
+  ),
+  buildSong(
+    "frere-jacques",
+    "Frère Jacques (蛙の合唱の原曲)",
+    "フランス民謡・PD",
+    104,
+    "C4:1 D4:1 E4:1 C4:1 C4:1 D4:1 E4:1 C4:1 " +
+      "E4:1 F4:1 G4:2 E4:1 F4:1 G4:2 " +
+      "G4:0.5 A4:0.5 G4:0.5 F4:0.5 E4:1 C4:1 G4:0.5 A4:0.5 G4:0.5 F4:0.5 E4:1 C4:1 " +
+      "C4:1 G3:1 C4:2 C4:1 G3:1 C4:2",
+    "C3:4 C3:4 G2:2 G2:2 C3:4 C3:4"
   ),
 ];
 
