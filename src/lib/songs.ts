@@ -247,15 +247,20 @@ export const SONGS: Song[] = [
     "Canon in D",
     "パッヘルベル・PD",
     88,
-    // This is the actual first-violin melody line (not just a rhythmicized
-    // bass), taken from a published ABC transcription - the real tune, not
-    // an improvised stand-in.
+    // The stately whole-note opening theme, then a livelier verified
+    // variation (from a later violin entry in the same published score) so
+    // it builds into something more active to actually play, rather than
+    // staying at the same slow single-note-every-few-seconds pace throughout.
     "F#5:4 E5:4 D5:4 C#5:4 B4:4 A4:4 B4:4 C#5:4 " +
       "D5:4 C#5:4 B4:4 A4:4 G4:4 F#4:4 G4:4 E4:4 " +
-      "D5:6",
+      "D4:2 F#4:2 A4:2 G4:2 F#4:2 D4:2 F#4:2 E4:2 " +
+      "D4:2 B3:2 D4:2 A4:2 G4:2 B4:2 A4:2 G4:2 " +
+      "F#4:2 D4:2 E4:2 C5:2 D5:2 F#5:2 A5:2 A4:2 " +
+      "B4:2 G4:2 A4:2 F#4:2 D4:2 D5:2 D5:3 C5:1",
     "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4 " +
       "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4 " +
-      "D2:6",
+      "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4 " +
+      "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4",
     "classical"
   ),
   buildSong(
