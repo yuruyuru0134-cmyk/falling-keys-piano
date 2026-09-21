@@ -7,6 +7,7 @@ import ResultScreen from "@/components/ResultScreen";
 import { SONGS, type Song } from "@/lib/songs";
 import type { Difficulty } from "@/lib/theory";
 import { songFromMidiFile } from "@/lib/midiImport";
+import type { InstrumentId } from "@/lib/audio";
 
 const CUSTOM_SONGS_KEY = "falling-keys-custom-songs";
 
@@ -17,6 +18,7 @@ export default function Home() {
   const [view, setView] = useState<View>("menu");
   const [song, setSong] = useState<Song | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [instrument, setInstrument] = useState<InstrumentId>("piano");
   const [result, setResult] = useState<GameResult | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState(0);
@@ -54,9 +56,10 @@ export default function Home() {
 
   const allSongs = [...SONGS, ...customSongs];
 
-  function handleStart(s: Song, d: Difficulty) {
+  function handleStart(s: Song, d: Difficulty, i: InstrumentId) {
     setSong(s);
     setDifficulty(d);
+    setInstrument(i);
     setResult(null);
     setSessionId((id) => id + 1);
     setView("playing");
@@ -83,6 +86,7 @@ export default function Home() {
           key={sessionId}
           song={song}
           difficulty={difficulty}
+          instrument={instrument}
           onExit={() => setView("menu")}
           onFinish={(r) => {
             setResult(r);

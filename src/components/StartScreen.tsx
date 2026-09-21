@@ -3,10 +3,11 @@
 import { useRef, useState } from "react";
 import type { Song } from "@/lib/songs";
 import { DIFFICULTIES, DIFFICULTY_SETTINGS, type Difficulty } from "@/lib/theory";
+import { INSTRUMENTS, getAudioEngine, type InstrumentId } from "@/lib/audio";
 
 type Props = {
   songs: Song[];
-  onStart: (song: Song, difficulty: Difficulty) => void;
+  onStart: (song: Song, difficulty: Difficulty, instrument: InstrumentId) => void;
   onImportMidi: (file: File) => Promise<void>;
   importError: string | null;
 };
@@ -14,10 +15,20 @@ type Props = {
 export default function StartScreen({ songs, onStart, onImportMidi, importError }: Props) {
   const [selectedId, setSelectedId] = useState(songs[0]?.id ?? "");
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [instrument, setInstrument] = useState<InstrumentId>("piano");
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selected = songs.find((s) => s.id === selectedId) ?? songs[0];
+
+  function previewInstrument(id: InstrumentId) {
+    setInstrument(id);
+    const engine = getAudioEngine();
+    engine.unlock();
+    engine.setInstrument(id);
+    engine.noteOn(64, 0.8); // E4 - quick demo note
+    window.setTimeout(() => engine.noteOff(64), 380);
+  }
 
   return (
     <div className="mx-auto flex h-full w-full max-w-3xl flex-col gap-5 overflow-y-auto px-4 py-6 text-slate-100">
@@ -79,6 +90,27 @@ export default function StartScreen({ songs, onStart, onImportMidi, importError 
       </section>
 
       <section>
+        <h2 className="mb-2 text-sm font-semibold text-slate-300">音源を選ぶ</h2>
+        <div className="grid grid-cols-4 gap-2">
+          {INSTRUMENTS.map((inst) => (
+            <button
+              key={inst.id}
+              onClick={() => previewInstrument(inst.id)}
+              className={[
+                "rounded-xl border px-2 py-3 text-center text-sm font-semibold transition-colors",
+                inst.id === instrument
+                  ? "border-amber-400 bg-amber-500/10"
+                  : "border-slate-800 bg-slate-900 active:bg-slate-800",
+              ].join(" ")}
+            >
+              {inst.label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-1 text-xs text-slate-500">タップすると音を試聴できます。</p>
+      </section>
+
+      <section>
         <h2 className="mb-2 text-sm font-semibold text-slate-300">難易度を選ぶ</h2>
         <div className="grid grid-cols-3 gap-2">
           {DIFFICULTIES.map((d) => {
@@ -104,7 +136,7 @@ export default function StartScreen({ songs, onStart, onImportMidi, importError 
 
       <button
         disabled={!selected}
-        onClick={() => selected && onStart(selected, difficulty)}
+        onClick={() => selected && onStart(selected, difficulty, instrument)}
         className="mt-2 w-full rounded-xl bg-sky-500 py-4 text-lg font-bold text-white shadow-lg shadow-sky-500/30 active:bg-sky-600 disabled:opacity-50"
       >
         スタート

@@ -6,7 +6,7 @@ import FallingNotesCanvas, { FallingNotesHandle, JudgedNote } from "./FallingNot
 import type { Song } from "@/lib/songs";
 import { DIFFICULTY_SETTINGS, type Difficulty } from "@/lib/theory";
 import { getActiveNotes, getDisplayRange } from "@/lib/range";
-import { getAudioEngine } from "@/lib/audio";
+import { getAudioEngine, type InstrumentId } from "@/lib/audio";
 
 const MemoKeyboard = memo(PianoKeyboard);
 const MemoFalling = memo(FallingNotesCanvas);
@@ -25,6 +25,7 @@ export type GameResult = {
 type Props = {
   song: Song;
   difficulty: Difficulty;
+  instrument: InstrumentId;
   onExit: () => void;
   onFinish: (result: GameResult) => void;
 };
@@ -37,7 +38,7 @@ function rankFor(accuracy: number): GameResult["rank"] {
   return "D";
 }
 
-export default function Game({ song, difficulty, onExit, onFinish }: Props) {
+export default function Game({ song, difficulty, instrument, onExit, onFinish }: Props) {
   const settings = DIFFICULTY_SETTINGS[difficulty];
   const notes = useMemo(() => getActiveNotes(song, difficulty), [song, difficulty]);
   const { low, high } = useMemo(() => getDisplayRange(song, difficulty), [song, difficulty]);
@@ -66,6 +67,10 @@ export default function Game({ song, difficulty, onExit, onFinish }: Props) {
   useEffect(() => {
     stateRef.current.startPerf = performance.now();
   }, []);
+
+  useEffect(() => {
+    getAudioEngine().setInstrument(instrument);
+  }, [instrument]);
 
   useEffect(() => {
     let raf = 0;
