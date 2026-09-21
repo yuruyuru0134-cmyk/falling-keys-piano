@@ -24,11 +24,22 @@ export function getDisplayRange(song: Song, difficulty: Difficulty): { low: numb
   return { low: Math.max(PIANO_LOW, low), high: Math.min(PIANO_HIGH, high) };
 }
 
+// Judging only ever looks at the moment a key is pressed, never how long
+// it's held - a note's declared duration (e.g. Canon in D's whole notes)
+// is purely a visual cue. Without a cap, a long note's falling bar can end
+// up taller than the whole play field and look like it's demanding an
+// absurdly long hold.
+const MAX_VISUAL_HOLD_SECONDS = 1.1;
+
 export function getActiveNotes(song: Song, difficulty: Difficulty) {
   const settings = DIFFICULTY_SETTINGS[difficulty];
   const speed = settings.speedMultiplier;
   const source = settings.useFullArrangement ? [...song.melody, ...song.harmony] : song.melody;
   return source
-    .map((n) => ({ midi: n.midi, time: n.time / speed, duration: n.duration / speed }))
+    .map((n) => ({
+      midi: n.midi,
+      time: n.time / speed,
+      duration: Math.min(n.duration / speed, MAX_VISUAL_HOLD_SECONDS),
+    }))
     .sort((a, b) => a.time - b.time);
 }

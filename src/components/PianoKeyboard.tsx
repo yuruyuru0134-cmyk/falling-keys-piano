@@ -290,7 +290,7 @@ const PianoKeyboard = forwardRef<PianoKeyboardHandle, Props>(function PianoKeybo
   return (
     <div
       ref={containerRef}
-      className="relative w-full select-none touch-none"
+      className="piano-keyboard relative w-full select-none touch-none"
       style={{ height: "clamp(120px, 24vh, 220px)", touchAction: "none" }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

@@ -20,10 +20,14 @@ body {
   height: 100%;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
-  /* Holding a piano key is a long-press by design. Without these, iOS
-     Safari pops up its "Copy / Share / Look Up" callout menu and the
-     text-selection magnifier partway through the hold, stealing the
-     touch and cutting the note off. */
+}
+
+/* Holding a piano key is a long-press by design. Without these, iOS Safari
+   pops up its "Copy / Share / Look Up" callout menu and the text-selection
+   magnifier partway through the hold, stealing the touch and cutting the
+   note off. Scoped to the keyboard itself (not html/body) so it can't be a
+   factor in ordinary button taps elsewhere, e.g. the result screen. */
+.piano-keyboard {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
