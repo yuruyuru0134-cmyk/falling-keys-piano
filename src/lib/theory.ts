@@ -77,7 +77,7 @@ export function computeKeyboardLayout(lowMidi: number, highMidi: number): {
   return { keys, whiteKeyCount };
 }
 
-export const DIFFICULTIES = ["easy", "medium", "hard"] as const;
+export const DIFFICULTIES = ["easy", "medium", "mediumHard", "hard"] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
 
 export const DIFFICULTY_SETTINGS: Record<
@@ -112,6 +112,15 @@ export const DIFFICULTY_SETTINGS: Record<
     fallTime: 2.6,
     speedMultiplier: 1.0,
     hitWindow: 0.18,
+    useFullArrangement: false,
+    showLabels: true,
+  },
+  mediumHard: {
+    label: "やや難しい",
+    description: "メロディのみ・少し速め・判定やや厳しめ",
+    fallTime: 2.2,
+    speedMultiplier: 1.08,
+    hitWindow: 0.15,
     useFullArrangement: false,
     showLabels: true,
   },

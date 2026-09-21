@@ -32,6 +32,12 @@ const PianoKeyboard = forwardRef<PianoKeyboardHandle, Props>(function PianoKeybo
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  // Cached bounding rect, refreshed only on resize/orientation change - NOT
+  // on every pointer event. getBoundingClientRect() forces a synchronous
+  // layout reflow; calling it on every pointermove (which fires very often
+  // while a key is held down) was fighting the render loop for main-thread
+  // time and made the falling bars stutter during a long press.
+  const rectRef = useRef({ left: 0, top: 0, width: 0, height: 0 });
   const [pressed, setPressed] = useState<Set<number>>(new Set());
   const [flashes, setFlashes] = useState<Map<number, FlashState>>(new Map());
   const flashTimers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
@@ -50,12 +56,21 @@ const PianoKeyboard = forwardRef<PianoKeyboardHandle, Props>(function PianoKeybo
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) setContainerWidth(entry.contentRect.width);
-    });
+    const updateRect = () => {
+      const r = el.getBoundingClientRect();
+      rectRef.current = { left: r.left, top: r.top, width: r.width, height: r.height };
+      setContainerWidth(r.width);
+    };
+    const ro = new ResizeObserver(updateRect);
     ro.observe(el);
-    setContainerWidth(el.getBoundingClientRect().width);
-    return () => ro.disconnect();
+    updateRect();
+    window.addEventListener("scroll", updateRect, true);
+    window.addEventListener("orientationchange", updateRect);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("scroll", updateRect, true);
+      window.removeEventListener("orientationchange", updateRect);
+    };
   }, []);
 
   useImperativeHandle(ref, () => ({
@@ -89,8 +104,8 @@ const PianoKeyboard = forwardRef<PianoKeyboardHandle, Props>(function PianoKeybo
   // this is what lets every simultaneous finger be tracked independently.
   const hitTest = useCallback(
     (clientX: number, clientY: number): number | null => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect || whiteKeyWidth === 0) return null;
+      const rect = rectRef.current;
+      if (rect.width === 0 || whiteKeyWidth === 0) return null;
       const x = clientX - rect.left;
       const y = clientY - rect.top;
       if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;

@@ -112,7 +112,7 @@ export default function StartScreen({ songs, onStart, onImportMidi, importError 
 
       <section>
         <h2 className="mb-2 text-sm font-semibold text-slate-300">難易度を選ぶ</h2>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {DIFFICULTIES.map((d) => {
             const s = DIFFICULTY_SETTINGS[d];
             return (
