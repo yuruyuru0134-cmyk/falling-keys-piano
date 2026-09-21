@@ -104,16 +104,19 @@ export const SONGS: Song[] = [
     "Ode to Joy (Symphony No.9)",
     "ベートーヴェン・PD",
     112,
+    // A-A-B-A, cross-checked against a published ABC transcription (in G
+    // major there, transposed to C here) - the B section is a genuine
+    // repeated turn figure, not just a continued scale run.
     "E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 " +
       "C4:1 C4:1 D4:1 E4:1 E4:1.5 D4:0.5 D4:2 " +
       "E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 " +
       "C4:1 C4:1 D4:1 E4:1 D4:1.5 C4:0.5 C4:2 " +
-      "D4:1 D4:1 E4:1 C4:1 D4:1 E4:1 F4:1 E4:1 " +
-      "C4:1 D4:1 E4:1 F4:1 E4:1 D4:1 C4:1 D4:1 " +
-      "C4:1 D4:1 G3:1 G3:1 A4:1 G4:1 F4:1 E4:1 " +
-      "D4:1 C4:1 D4:1 G3:1 C4:4",
+      "D4:1 D4:1 E4:1 C4:1 D4:1 E4:0.5 F4:0.5 E4:1 C4:1 " +
+      "D4:1 E4:0.5 F4:0.5 E4:1 D4:1 C4:1 D4:1 G3:2 " +
+      "E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 " +
+      "C4:1 C4:1 D4:1 E4:1 D4:1.5 C4:0.5 C4:2",
     "C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 " +
-      "C3:4 G3:4 C3:4 G3:4 F3:4 C3:4 G3:4 C3:4"
+      "F3:4 C3:4 G3:4 D3:4 C3:4 G3:4 C3:4 G3:4"
   ),
   buildSong(
     "jingle-bells",
