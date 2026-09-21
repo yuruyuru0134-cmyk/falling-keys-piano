@@ -37,27 +37,46 @@ type KeyProps = {
   isPressed: boolean;
 };
 
+// Neon-tube glow around the key's edge: white for a correct hit, red for a
+// miss/wrong press. Replaces filling the whole key with a solid color so the
+// key itself keeps reading as a piano key - only its outline lights up.
+const NEON_WHITE =
+  "z-30 border-white shadow-[0_0_4px_1px_#ffffff,0_0_16px_6px_rgba(255,255,255,0.9),0_0_34px_14px_rgba(255,255,255,0.5)]";
+const NEON_RED =
+  "z-30 border-red-400 shadow-[0_0_4px_1px_#f87171,0_0_16px_6px_rgba(239,68,68,0.9),0_0_34px_14px_rgba(239,68,68,0.5)]";
+
 // Memoized so a flash/press change on ONE key doesn't force every other key
 // on the keyboard to re-render and re-diff its DOM node too. With 15-36 keys
 // on screen, re-rendering all of them on every miss event (common during a
 // long press in a fast song) was expensive enough to cause visible stutter.
 const Key = memo(function Key({ midi, isBlack, left, width, showLabel, flash, isPressed }: KeyProps) {
   const label = midiToName(midi);
+
+  const glow =
+    flash?.type === "correct"
+      ? NEON_WHITE
+      : flash?.type === "wrong"
+        ? NEON_RED
+        : isPressed
+          ? isBlack
+            ? "border-sky-400 shadow-[0_0_10px_2px_rgba(56,189,248,0.6)]"
+            : "border-sky-400 shadow-[inset_0_-6px_10px_rgba(56,189,248,0.5)]"
+          : isBlack
+            ? "border-slate-950"
+            : "border-slate-400";
+
   if (isBlack) {
     return (
       <div
         role="presentation"
         aria-label={label}
         className={[
-          "absolute top-0 rounded-b-md z-20 box-border pointer-events-none",
-          "transition-[background-color,box-shadow] duration-75",
-          flash?.type === "correct"
-            ? "bg-white shadow-[0_0_18px_6px_rgba(52,211,153,0.85)]"
-            : flash?.type === "wrong"
-              ? "bg-red-500 shadow-[0_0_18px_6px_rgba(239,68,68,0.85)]"
-              : isPressed
-                ? "bg-gradient-to-b from-sky-400 to-sky-600 shadow-[0_0_10px_2px_rgba(56,189,248,0.6)]"
-                : "bg-gradient-to-b from-slate-800 to-slate-950",
+          "absolute top-0 rounded-b-md z-20 box-border pointer-events-none border-2",
+          "transition-[box-shadow,border-color] duration-100",
+          isPressed
+            ? "bg-gradient-to-b from-sky-400 to-sky-600"
+            : "bg-gradient-to-b from-slate-800 to-slate-950",
+          glow,
         ].join(" ")}
         style={{ left, width, height: "62%" }}
       />
@@ -68,16 +87,11 @@ const Key = memo(function Key({ midi, isBlack, left, width, showLabel, flash, is
       role="presentation"
       aria-label={label}
       className={[
-        "absolute bottom-0 top-0 rounded-b-md border border-slate-400 box-border",
+        "absolute bottom-0 top-0 rounded-b-md border-2 box-border",
         "flex items-end justify-center pb-1 text-[10px] font-medium text-slate-400",
-        "transition-[background-color,box-shadow] duration-75 pointer-events-none",
-        flash?.type === "correct"
-          ? "bg-white z-10 shadow-[0_0_24px_8px_rgba(52,211,153,0.75)]"
-          : flash?.type === "wrong"
-            ? "bg-red-400 text-white z-10 shadow-[0_0_24px_8px_rgba(239,68,68,0.75)]"
-            : isPressed
-              ? "bg-sky-100 shadow-[inset_0_-6px_10px_rgba(56,189,248,0.5)]"
-              : "bg-white",
+        "transition-[box-shadow,border-color] duration-100 pointer-events-none",
+        isPressed ? "bg-sky-100" : "bg-white",
+        glow,
       ].join(" ")}
       style={{ left, width }}
     >

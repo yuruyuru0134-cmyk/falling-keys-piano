@@ -125,7 +125,6 @@ const FallingNotesCanvas = forwardRef<FallingNotesHandle, Props>(function Fallin
         const remaining = note.time - currentTime;
         if (remaining > fallTime || remaining < -0.4) return;
         const status = judged[i];
-        if (status === "hit") return;
 
         const layout = layoutByMidi.get(note.midi);
         if (!layout) return;
@@ -145,7 +144,14 @@ const FallingNotesCanvas = forwardRef<FallingNotesHandle, Props>(function Fallin
         const approach = Math.max(0, 1 - Math.max(0, remaining) / (fallTime * 0.35));
 
         let top1: string, bot1: string, glowColor: string;
-        if (status === "miss") {
+        if (status === "hit") {
+          // Keeps falling naturally through the hit line instead of
+          // popping out of existence the instant it's caught, styled bright
+          // to read as "success" as it slides the rest of the way through.
+          top1 = "#ffffff";
+          bot1 = "#e2e8f0";
+          glowColor = "rgba(255,255,255,0.85)";
+        } else if (status === "miss") {
           top1 = "#94a3b8";
           bot1 = "#64748b";
           glowColor = "rgba(148,163,184,0)";
