@@ -1,5 +1,5 @@
 {
-  "name": "piano-trainer-tmp",
+  "name": "piano-falling-notes",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tonejs/midi": "^2.0.28",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"

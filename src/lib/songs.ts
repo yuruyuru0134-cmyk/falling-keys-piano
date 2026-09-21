@@ -1,0 +1,162 @@
+import { nameToMidi } from "./theory";
+
+export type NoteEvent = { midi: number; time: number; duration: number };
+
+export type Song = {
+  id: string;
+  title: string;
+  subtitle: string;
+  bpm: number;
+  /** main melody line (used for easy/medium difficulties) */
+  melody: NoteEvent[];
+  /** extra notes (left hand / harmony) added on top of melody for hard difficulty */
+  harmony: NoteEvent[];
+  lengthSeconds: number;
+  range: { low: number; high: number };
+};
+
+/**
+ * Tiny melody DSL: space-separated tokens of "NOTE:BEATS", chords with "+",
+ * rests as "R:BEATS". One beat = one quarter note at the song's bpm.
+ *   "C4:1 D4:1 E4+G4:2 R:1"
+ */
+function parseLine(line: string, beatSec: number, t0 = 0): { events: NoteEvent[]; end: number } {
+  const events: NoteEvent[] = [];
+  let t = t0;
+  for (const tok of line.trim().split(/\s+/).filter(Boolean)) {
+    const [notesPart, beatsPart] = tok.split(":");
+    const beats = parseFloat(beatsPart);
+    const dur = beats * beatSec;
+    if (notesPart !== "R") {
+      for (const n of notesPart.split("+")) {
+        events.push({ midi: nameToMidi(n), time: t, duration: dur * 0.92 });
+      }
+    }
+    t += dur;
+  }
+  return { events, end: t };
+}
+
+function buildSong(
+  id: string,
+  title: string,
+  subtitle: string,
+  bpm: number,
+  melodyStr: string,
+  harmonyStr = ""
+): Song {
+  const beatSec = 60 / bpm;
+  const { events: melody, end: melodyEnd } = parseLine(melodyStr, beatSec);
+  const { events: harmony, end: harmonyEnd } = parseLine(harmonyStr, beatSec);
+  const all = [...melody, ...harmony];
+  const low = Math.min(...all.map((n) => n.midi));
+  const high = Math.max(...all.map((n) => n.midi));
+  return {
+    id,
+    title,
+    subtitle,
+    bpm,
+    melody,
+    harmony,
+    lengthSeconds: Math.max(melodyEnd, harmonyEnd) + 1.5,
+    range: { low, high },
+  };
+}
+
+// All songs below are traditional / public-domain melodies (folk songs or
+// composers who died 70+ years ago), hand-transcribed for this app rather
+// than pulled from any copyrighted arrangement or recording.
+export const SONGS: Song[] = [
+  buildSong(
+    "hot-cross-buns",
+    "Hot Cross Buns",
+    "英語の伝承童謡・PD",
+    100,
+    "B4:1 A4:1 G4:2 B4:1 A4:1 G4:2 G4:0.5 G4:0.5 G4:0.5 G4:0.5 A4:0.5 A4:0.5 A4:0.5 A4:0.5 B4:1 A4:1 G4:2",
+    "G3:4 G3:4 G3:2 G3:2 G3:4"
+  ),
+  buildSong(
+    "twinkle-twinkle",
+    "Twinkle Twinkle Little Star",
+    "フランス民謡・PD",
+    100,
+    "C4:1 C4:1 G4:1 G4:1 A4:1 A4:1 G4:2 " +
+      "F4:1 F4:1 E4:1 E4:1 D4:1 D4:1 C4:2 " +
+      "G4:1 G4:1 F4:1 F4:1 E4:1 E4:1 D4:2 " +
+      "G4:1 G4:1 F4:1 F4:1 E4:1 E4:1 D4:2 " +
+      "C4:1 C4:1 G4:1 G4:1 A4:1 A4:1 G4:2 " +
+      "F4:1 F4:1 E4:1 E4:1 D4:1 D4:1 C4:2",
+    "C3:4 G3:4 F3:4 C3:4 G3:4 D3:4 G3:4 D3:4 C3:4 G3:4 F3:4 C3:4"
+  ),
+  buildSong(
+    "mary-lamb",
+    "Mary Had a Little Lamb",
+    "アメリカ民謡・PD",
+    108,
+    "E4:1 D4:1 C4:1 D4:1 E4:1 E4:1 E4:2 " +
+      "D4:1 D4:1 D4:2 E4:1 G4:1 G4:2 " +
+      "E4:1 D4:1 C4:1 D4:1 E4:1 E4:1 E4:1 E4:1 " +
+      "D4:1 D4:1 E4:1 D4:1 C4:4",
+    "C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 C3:4 G3:4"
+  ),
+  buildSong(
+    "ode-to-joy",
+    "Ode to Joy (Symphony No.9)",
+    "ベートーヴェン・PD",
+    112,
+    "E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 " +
+      "C4:1 C4:1 D4:1 E4:1 E4:1.5 D4:0.5 D4:2 " +
+      "E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 " +
+      "C4:1 C4:1 D4:1 E4:1 D4:1.5 C4:0.5 C4:2",
+    "C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 C3:4 G3:4"
+  ),
+  buildSong(
+    "jingle-bells",
+    "Jingle Bells (Chorus)",
+    "J. ピアポント・PD",
+    120,
+    "E4:1 E4:1 E4:2 E4:1 E4:1 E4:2 " +
+      "E4:1 G4:1 C4:1.5 D4:0.5 E4:4 " +
+      "F4:1 F4:1 F4:1.5 F4:0.5 F4:1 E4:1 E4:1 E4:0.5 E4:0.5 " +
+      "E4:1 D4:1 D4:1 E4:1 D4:2 G4:2",
+    "C3:4 C3:4 G3:4 C3:4 F3:4 F3:4 C3:4 G3:4"
+  ),
+  buildSong(
+    "auld-lang-syne",
+    "Auld Lang Syne",
+    "スコットランド民謡・PD",
+    90,
+    "C4:1 F4:2 F4:1 F4:1 A4:1 G4:1 F4:1 " +
+      "G4:1 A4:2 C5:1 A4:1 G4:1 F4:1 G4:1 F4:3 " +
+      "C4:1 F4:2 F4:1 F4:1 A4:1 G4:1 F4:1",
+    "F3:4 F3:4 C3:4 F3:4 F3:4 C3:4 F3:4"
+  ),
+  buildSong(
+    "greensleeves",
+    "Greensleeves",
+    "イングランド民謡・PD",
+    92,
+    "A4:1.5 C5:0.5 D5:1 E5:1 F5:1.5 D5:0.5 " +
+      "E5:1 C5:1 A4:1.5 G4:0.5 A4:2 " +
+      "A4:1.5 C5:0.5 D5:1 E5:1 F5:1.5 D5:0.5 " +
+      "E5:1 C5:1 D5:1.5 C5:0.5 A4:2",
+    "A3:4 A3:4 F3:4 E3:4 A3:4 A3:4 F3:4 E3:4"
+  ),
+  buildSong(
+    "fur-elise",
+    "Für Elise (Opening)",
+    "ベートーヴェン・PD",
+    100,
+    "E5:0.5 D#5:0.5 E5:0.5 D#5:0.5 E5:0.5 B4:0.5 D5:0.5 C5:0.5 " +
+      "A4:1 R:0.5 C4:0.5 E4:0.5 A4:0.5 B4:1 R:0.5 " +
+      "E4:0.5 G#4:0.5 B4:0.5 C5:1 R:0.5 E4:0.5 " +
+      "E5:0.5 D#5:0.5 E5:0.5 D#5:0.5 E5:0.5 B4:0.5 D5:0.5 C5:0.5 " +
+      "A4:1 R:0.5 C4:0.5 E4:0.5 A4:0.5 B4:1 R:0.5",
+    "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 " +
+      "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 A2:2 E3:2"
+  ),
+];
+
+export function getSong(id: string): Song | undefined {
+  return SONGS.find((s) => s.id === id);
+}
