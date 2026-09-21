@@ -123,8 +123,7 @@ const FallingNotesCanvas = forwardRef<FallingNotesHandle, Props>(function Fallin
 
       notes.forEach((note, i) => {
         const remaining = note.time - currentTime;
-        if (remaining > fallTime || remaining < -0.4) return;
-        const status = judged[i];
+        if (remaining > fallTime) return; // not visible yet
 
         const layout = layoutByMidi.get(note.midi);
         if (!layout) return;
@@ -132,44 +131,31 @@ const FallingNotesCanvas = forwardRef<FallingNotesHandle, Props>(function Fallin
         const pxHeight = Math.max((note.duration / fallTime) * height, 10);
         const bottom = height - (remaining / fallTime) * height;
         const top = bottom - pxHeight;
+        if (top >= height) return; // fully passed by - nothing left to draw
         const barH = Math.max(bottom - top, 6);
 
+        const status = judged[i];
         const inset = layout.isBlack ? 2 : 3;
         const x = layout.x * whiteKeyWidth + inset;
         const w = Math.max(layout.width * whiteKeyWidth - inset * 2, 4);
         const r = Math.min(7, w / 2, barH / 2);
 
-        // How close this bar's leading edge is to the hit line - used to
-        // brighten/glow it as it approaches, like an "incoming" cue.
-        const approach = Math.max(0, 1 - Math.max(0, remaining) / (fallTime * 0.35));
-
-        let top1: string, bot1: string, glowColor: string;
-        if (status === "hit") {
-          // Keeps falling naturally through the hit line instead of
-          // popping out of existence the instant it's caught, styled bright
-          // to read as "success" as it slides the rest of the way through.
-          top1 = "#ffffff";
-          bot1 = "#e2e8f0";
-          glowColor = "rgba(255,255,255,0.85)";
-        } else if (status === "miss") {
+        // Same look whether it's still falling, was just hit, or was
+        // missed (aside from miss turning it grey) - it keeps moving
+        // through and past the hit line unchanged, never disappearing
+        // early or flashing a different color.
+        let top1: string, bot1: string;
+        if (status === "miss") {
           top1 = "#94a3b8";
           bot1 = "#64748b";
-          glowColor = "rgba(148,163,184,0)";
         } else if (layout.isBlack) {
           top1 = "#c4b5fd";
           bot1 = "#7c3aed";
-          glowColor = `rgba(167,139,250,${0.25 + approach * 0.45})`;
         } else {
           top1 = "#7dd3fc";
           bot1 = "#0284c7";
-          glowColor = `rgba(56,189,248,${0.25 + approach * 0.45})`;
         }
 
-        ctx.save();
-        if (status !== "miss") {
-          ctx.shadowColor = glowColor;
-          ctx.shadowBlur = 6 + approach * 14;
-        }
         const grad = ctx.createLinearGradient(0, top, 0, bottom);
         grad.addColorStop(0, top1);
         grad.addColorStop(1, bot1);
@@ -177,7 +163,6 @@ const FallingNotesCanvas = forwardRef<FallingNotesHandle, Props>(function Fallin
         ctx.beginPath();
         ctx.roundRect(x, top, w, barH, r);
         ctx.fill();
-        ctx.restore();
 
         // Glassy highlight strip down the middle for a glossy, game-like look.
         if (w > 10) {
