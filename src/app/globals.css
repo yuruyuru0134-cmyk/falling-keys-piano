@@ -20,6 +20,14 @@ body {
   height: 100%;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
+  /* Holding a piano key is a long-press by design. Without these, iOS
+     Safari pops up its "Copy / Share / Look Up" callout menu and the
+     text-selection magnifier partway through the hold, stealing the
+     touch and cutting the note off. */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* Respect the iPhone/iPad notch & home-indicator when running as an
