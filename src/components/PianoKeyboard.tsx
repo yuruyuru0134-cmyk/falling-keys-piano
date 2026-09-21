@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -25,6 +26,65 @@ type Props = {
 };
 
 type FlashState = { type: FlashType; nonce: number };
+
+type KeyProps = {
+  midi: number;
+  isBlack: boolean;
+  left: number;
+  width: number;
+  showLabel: boolean;
+  flash?: FlashState;
+  isPressed: boolean;
+};
+
+// Memoized so a flash/press change on ONE key doesn't force every other key
+// on the keyboard to re-render and re-diff its DOM node too. With 15-36 keys
+// on screen, re-rendering all of them on every miss event (common during a
+// long press in a fast song) was expensive enough to cause visible stutter.
+const Key = memo(function Key({ midi, isBlack, left, width, showLabel, flash, isPressed }: KeyProps) {
+  const label = midiToName(midi);
+  if (isBlack) {
+    return (
+      <div
+        role="presentation"
+        aria-label={label}
+        className={[
+          "absolute top-0 rounded-b-md z-20 box-border pointer-events-none",
+          "transition-[background-color,box-shadow] duration-75",
+          flash?.type === "correct"
+            ? "bg-white shadow-[0_0_18px_6px_rgba(52,211,153,0.85)]"
+            : flash?.type === "wrong"
+              ? "bg-red-500 shadow-[0_0_18px_6px_rgba(239,68,68,0.85)]"
+              : isPressed
+                ? "bg-gradient-to-b from-sky-400 to-sky-600 shadow-[0_0_10px_2px_rgba(56,189,248,0.6)]"
+                : "bg-gradient-to-b from-slate-800 to-slate-950",
+        ].join(" ")}
+        style={{ left, width, height: "62%" }}
+      />
+    );
+  }
+  return (
+    <div
+      role="presentation"
+      aria-label={label}
+      className={[
+        "absolute bottom-0 top-0 rounded-b-md border border-slate-400 box-border",
+        "flex items-end justify-center pb-1 text-[10px] font-medium text-slate-400",
+        "transition-[background-color,box-shadow] duration-75 pointer-events-none",
+        flash?.type === "correct"
+          ? "bg-white z-10 shadow-[0_0_24px_8px_rgba(52,211,153,0.75)]"
+          : flash?.type === "wrong"
+            ? "bg-red-400 text-white z-10 shadow-[0_0_24px_8px_rgba(239,68,68,0.75)]"
+            : isPressed
+              ? "bg-sky-100 shadow-[inset_0_-6px_10px_rgba(56,189,248,0.5)]"
+              : "bg-white",
+      ].join(" ")}
+      style={{ left, width }}
+    >
+      {showLabel ? label : ""}
+    </div>
+  );
+});
 
 const PianoKeyboard = forwardRef<PianoKeyboardHandle, Props>(function PianoKeyboard(
   { lowMidi, highMidi, onNoteOn, onNoteOff },
@@ -223,60 +283,30 @@ const PianoKeyboard = forwardRef<PianoKeyboardHandle, Props>(function PianoKeybo
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
     >
-      {whiteKeys.map((k) => {
-        const flash = flashes.get(k.midi);
-        const isPressed = pressed.has(k.midi);
-        const showLabel = k.midi % 12 === 0; // C notes
-        return (
-          <div
-            key={k.midi}
-            role="presentation"
-            aria-label={midiToName(k.midi)}
-            className={[
-              "absolute bottom-0 top-0 rounded-b-md border border-slate-400 box-border",
-              "flex items-end justify-center pb-1 text-[10px] font-medium text-slate-400",
-              "transition-colors duration-75 pointer-events-none",
-              flash?.type === "correct"
-                ? "bg-white ring-4 ring-emerald-300 z-10"
-                : flash?.type === "wrong"
-                  ? "bg-red-500 text-white z-10"
-                  : isPressed
-                    ? "bg-sky-100"
-                    : "bg-white",
-            ].join(" ")}
-            style={{ left: k.x * whiteKeyWidth, width: whiteKeyWidth }}
-          >
-            {showLabel ? midiToName(k.midi) : ""}
-          </div>
-        );
-      })}
-      {blackKeys.map((k) => {
-        const flash = flashes.get(k.midi);
-        const isPressed = pressed.has(k.midi);
-        return (
-          <div
-            key={k.midi}
-            role="presentation"
-            aria-label={midiToName(k.midi)}
-            className={[
-              "absolute top-0 rounded-b-md z-20 box-border pointer-events-none",
-              "transition-colors duration-75",
-              flash?.type === "correct"
-                ? "bg-white ring-4 ring-emerald-300"
-                : flash?.type === "wrong"
-                  ? "bg-red-500"
-                  : isPressed
-                    ? "bg-sky-500"
-                    : "bg-slate-900",
-            ].join(" ")}
-            style={{
-              left: k.x * whiteKeyWidth,
-              width: k.width * whiteKeyWidth,
-              height: "62%",
-            }}
-          />
-        );
-      })}
+      {whiteKeys.map((k) => (
+        <Key
+          key={k.midi}
+          midi={k.midi}
+          isBlack={false}
+          left={k.x * whiteKeyWidth}
+          width={whiteKeyWidth}
+          showLabel={k.midi % 12 === 0}
+          flash={flashes.get(k.midi)}
+          isPressed={pressed.has(k.midi)}
+        />
+      ))}
+      {blackKeys.map((k) => (
+        <Key
+          key={k.midi}
+          midi={k.midi}
+          isBlack
+          left={k.x * whiteKeyWidth}
+          width={k.width * whiteKeyWidth}
+          showLabel={false}
+          flash={flashes.get(k.midi)}
+          isPressed={pressed.has(k.midi)}
+        />
+      ))}
     </div>
   );
 });

@@ -177,6 +177,7 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
     if (bestIdx >= 0) {
       judgedRef.current[bestIdx] = "hit";
       keyboardRef.current?.flashKey(midi, "correct");
+      fallingRef.current?.pulse(midi);
       setHud((prev) => {
         const combo = prev.combo + 1;
         const gained = 100 + Math.min(combo, 20) * 5;
