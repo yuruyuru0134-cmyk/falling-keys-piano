@@ -60,6 +60,7 @@ export async function songFromMidiFile(file: File): Promise<Song> {
     title: name || "インポートした曲",
     subtitle: "取り込んだ MIDI ファイル",
     bpm,
+    category: "custom",
     melody,
     harmony,
     lengthSeconds,

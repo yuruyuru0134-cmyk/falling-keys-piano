@@ -2,11 +2,21 @@ import { nameToMidi, DURATION_SCALE } from "./theory";
 
 export type NoteEvent = { midi: number; time: number; duration: number };
 
+export type SongCategory = "world" | "classical" | "japan" | "custom";
+
+export const CATEGORY_LABELS: Record<SongCategory, string> = {
+  world: "世界の民謡・童謡",
+  classical: "クラシック",
+  japan: "日本の唱歌・童謡",
+  custom: "追加した曲",
+};
+
 export type Song = {
   id: string;
   title: string;
   subtitle: string;
   bpm: number;
+  category: SongCategory;
   /** main melody line (used for easy/medium difficulties) */
   melody: NoteEvent[];
   /** extra notes (left hand / harmony) added on top of melody for hard difficulty */
@@ -43,7 +53,8 @@ function buildSong(
   subtitle: string,
   bpm: number,
   melodyStr: string,
-  harmonyStr = ""
+  harmonyStr: string,
+  category: SongCategory
 ): Song {
   const beatSec = (60 / bpm) * DURATION_SCALE;
   const { events: melody, end: melodyEnd } = parseLine(melodyStr, beatSec);
@@ -56,6 +67,7 @@ function buildSong(
     title,
     subtitle,
     bpm,
+    category,
     melody,
     harmony,
     lengthSeconds: Math.max(melodyEnd, harmonyEnd) + 1.5,
@@ -73,7 +85,8 @@ export const SONGS: Song[] = [
     "英語の伝承童謡・PD",
     100,
     "B4:1 A4:1 G4:2 B4:1 A4:1 G4:2 G4:0.5 G4:0.5 G4:0.5 G4:0.5 A4:0.5 A4:0.5 A4:0.5 A4:0.5 B4:1 A4:1 G4:2",
-    "G3:4 G3:4 G3:2 G3:2 G3:4"
+    "G3:4 G3:4 G3:2 G3:2 G3:4",
+    "world"
   ),
   buildSong(
     "twinkle-twinkle",
@@ -86,7 +99,8 @@ export const SONGS: Song[] = [
       "G4:1 G4:1 F4:1 F4:1 E4:1 E4:1 D4:2 " +
       "C4:1 C4:1 G4:1 G4:1 A4:1 A4:1 G4:2 " +
       "F4:1 F4:1 E4:1 E4:1 D4:1 D4:1 C4:2",
-    "C3:4 G3:4 F3:4 C3:4 G3:4 D3:4 G3:4 D3:4 C3:4 G3:4 F3:4 C3:4"
+    "C3:4 G3:4 F3:4 C3:4 G3:4 D3:4 G3:4 D3:4 C3:4 G3:4 F3:4 C3:4",
+    "world"
   ),
   buildSong(
     "mary-lamb",
@@ -97,7 +111,8 @@ export const SONGS: Song[] = [
       "D4:1 D4:1 D4:2 E4:1 G4:1 G4:2 " +
       "E4:1 D4:1 C4:1 D4:1 E4:1 E4:1 E4:1 E4:1 " +
       "D4:1 D4:1 E4:1 D4:1 C4:4",
-    "C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 C3:4 G3:4"
+    "C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 C3:4 G3:4",
+    "world"
   ),
   buildSong(
     "ode-to-joy",
@@ -116,7 +131,8 @@ export const SONGS: Song[] = [
       "E4:1 E4:1 F4:1 G4:1 G4:1 F4:1 E4:1 D4:1 " +
       "C4:1 C4:1 D4:1 E4:1 D4:1.5 C4:0.5 C4:2",
     "C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 C3:4 G3:4 " +
-      "F3:4 C3:4 G3:4 D3:4 C3:4 G3:4 C3:4 G3:4"
+      "F3:4 C3:4 G3:4 D3:4 C3:4 G3:4 C3:4 G3:4",
+    "classical"
   ),
   buildSong(
     "jingle-bells",
@@ -134,7 +150,8 @@ export const SONGS: Song[] = [
       "F4:0.5 F4:0.5 F4:0.75 F4:0.25 F4:0.5 E4:0.5 E4:0.5 E4:0.25 E4:0.25 " +
       "G4:0.5 G4:0.5 F4:0.5 D4:0.5 C4:2",
     "C3:2 G3:2 C3:2 F3:2 C3:2 G3:2 C3:2 C3:2 " +
-      "C3:2 G3:2 C3:2 F3:2 C3:2 G3:2 C3:2 C3:2"
+      "C3:2 G3:2 C3:2 F3:2 C3:2 G3:2 C3:2 C3:2",
+    "world"
   ),
   buildSong(
     "auld-lang-syne",
@@ -163,7 +180,8 @@ export const SONGS: Song[] = [
     "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 " +
       "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:4 " +
       "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 " +
-      "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:4"
+      "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:4",
+    "world"
   ),
   buildSong(
     "greensleeves",
@@ -191,7 +209,8 @@ export const SONGS: Song[] = [
       "C5:0.75 B4:0.25 A4:0.5 G#4:0.75 F#4:0.25 G4:0.5 " +
       "A4:1.5 A4:1",
     "A2:3 D3:3 A2:3 E3:3 A2:3 D3:3 A2:3 A2:3 " +
-      "C3:3 D3:3 A2:3 E3:3 C3:3 D3:3 A2:3 A2:2"
+      "C3:3 D3:3 A2:3 E3:3 C3:3 D3:3 A2:3 A2:2",
+    "world"
   ),
   buildSong(
     "fur-elise",
@@ -220,7 +239,8 @@ export const SONGS: Song[] = [
       "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 " +
       "C3:3 G2:3 A2:3 E2:3 E2:3 A2:3 " +
       "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 " +
-      "A2:2 E3:2 A2:2 E3:2 A2:4"
+      "A2:2 E3:2 A2:2 E3:2 A2:4",
+    "classical"
   ),
   buildSong(
     "canon-in-d",
@@ -235,7 +255,8 @@ export const SONGS: Song[] = [
       "D5:6",
     "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4 " +
       "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4 " +
-      "D2:6"
+      "D2:6",
+    "classical"
   ),
   buildSong(
     "fate-motif",
@@ -243,7 +264,8 @@ export const SONGS: Song[] = [
     "ベートーヴェン・PD",
     100,
     "G4:0.5 G4:0.5 G4:0.5 D#4:3 R:0.5 F4:0.5 F4:0.5 F4:0.5 D4:3",
-    "G2:4 R:4 F2:4 R:4"
+    "G2:4 R:4 F2:4 R:4",
+    "classical"
   ),
   buildSong(
     "frere-jacques",
@@ -254,7 +276,8 @@ export const SONGS: Song[] = [
       "E4:1 F4:1 G4:2 E4:1 F4:1 G4:2 " +
       "G4:0.5 A4:0.5 G4:0.5 F4:0.5 E4:1 C4:1 G4:0.5 A4:0.5 G4:0.5 F4:0.5 E4:1 C4:1 " +
       "C4:1 G3:1 C4:2 C4:1 G3:1 C4:2",
-    "C3:4 C3:4 G2:2 G2:2 C3:4 C3:4"
+    "C3:4 C3:4 G2:2 G2:2 C3:4 C3:4",
+    "world"
   ),
   buildSong(
     "chouchou",
@@ -263,7 +286,8 @@ export const SONGS: Song[] = [
     104,
     "G4:1 E4:1 E4:2 F4:1 D4:1 D4:2 C4:1 D4:1 E4:1 F4:1 G4:1 G4:1 G4:2 " +
       "G4:1 E4:1 E4:2 F4:1 D4:1 D4:2 C4:1 E4:1 G4:1 G4:1 C4:2",
-    "C3:4 G2:4 F2:4 C3:4 C3:4 G2:4 F2:4 C3:4"
+    "C3:4 G2:4 F2:4 C3:4 C3:4 G2:4 F2:4 C3:4",
+    "japan"
   ),
   buildSong(
     "donguri-korokoro",
@@ -274,7 +298,8 @@ export const SONGS: Song[] = [
       "E4:0.5 E4:0.5 G4:0.5 G4:0.5 A4:0.5 A4:0.5 A4:0.5 C5:1 E4:0.5 E4:0.5 G4:1.5 " +
       "G4:0.5 G4:0.5 E4:0.5 E4:0.5 F4:0.5 E4:0.5 D4:0.5 C4:1 G4:0.5 E4:0.5 E4:0.5 D4:1.5 " +
       "G4:0.5 E4:0.5 A4:0.5 G4:0.5 G4:0.5 A4:0.5 A4:0.5 B4:0.5 B4:0.5 C5:2",
-    "C3:4 F2:4 C3:4 G2:4 C3:4 F2:4 C3:4 G2:4"
+    "C3:4 F2:4 C3:4 G2:4 C3:4 F2:4 C3:4 G2:4",
+    "japan"
   ),
   buildSong(
     "furusato",
@@ -283,7 +308,8 @@ export const SONGS: Song[] = [
     80,
     "C4:1 C4:1 C4:1 D4:1 E4:1 D4:1 E4:1 E4:1 F4:1 G4:1 F4:1 G4:1 " +
       "A4:1 E4:1 F4:1 E4:1 D4:1 D4:1 B3:1 C4:2",
-    "C3:3 F2:3 G2:3 C3:3 F2:3 G2:2"
+    "C3:3 F2:3 G2:3 C3:3 F2:3 G2:2",
+    "japan"
   ),
   buildSong(
     "london-bridge",
@@ -292,7 +318,8 @@ export const SONGS: Song[] = [
     108,
     "G4:1 A4:1 G4:1 F4:1 E4:1 F4:1 G4:1 D4:1 E4:1 F4:2 E4:1 F4:1 G4:2 " +
       "G4:1 A4:1 G4:1 F4:1 E4:1 F4:1 G4:1 D4:1 G4:1 E4:1 C4:2",
-    "C3:4 F2:2 G2:2 C3:4 C3:4 F2:2 G2:2 C3:4"
+    "C3:4 F2:2 G2:2 C3:4 C3:4 F2:2 G2:2 C3:4",
+    "world"
   ),
   buildSong(
     "row-row-row-your-boat",
@@ -303,7 +330,8 @@ export const SONGS: Song[] = [
       "E4:0.66 D4:0.66 E4:0.66 F4:1 G4:2 " +
       "C5:0.5 C5:0.5 C5:0.5 G4:0.5 G4:0.5 G4:0.5 E4:0.5 E4:0.5 E4:0.5 C4:0.5 C4:0.5 C4:0.5 " +
       "G4:1 F4:1 E4:1 D4:1 C4:2",
-    "C3:4 C3:4 C3:4 C3:4"
+    "C3:4 C3:4 C3:4 C3:4",
+    "world"
   ),
 ];
 

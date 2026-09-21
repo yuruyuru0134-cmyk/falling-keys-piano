@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
-import type { Song } from "@/lib/songs";
+import { useMemo, useRef, useState } from "react";
+import { CATEGORY_LABELS, type Song, type SongCategory } from "@/lib/songs";
 import { DIFFICULTIES, DIFFICULTY_SETTINGS, type Difficulty } from "@/lib/theory";
 import { INSTRUMENTS, getAudioEngine, type InstrumentId } from "@/lib/audio";
+
+const CATEGORY_ORDER: SongCategory[] = ["world", "japan", "classical", "custom"];
 
 type Props = {
   songs: Song[];
@@ -20,6 +22,20 @@ export default function StartScreen({ songs, onStart, onImportMidi, importError 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selected = songs.find((s) => s.id === selectedId) ?? songs[0];
+
+  const groupedSongs = useMemo(() => {
+    const groups = new Map<SongCategory, Song[]>();
+    for (const song of songs) {
+      const list = groups.get(song.category) ?? [];
+      list.push(song);
+      groups.set(song.category, list);
+    }
+    return CATEGORY_ORDER.filter((c) => groups.has(c)).map((c) => ({
+      category: c,
+      label: CATEGORY_LABELS[c],
+      songs: groups.get(c)!,
+    }));
+  }, [songs]);
 
   function previewInstrument(id: InstrumentId) {
     setInstrument(id);
@@ -41,21 +57,30 @@ export default function StartScreen({ songs, onStart, onImportMidi, importError 
 
       <section>
         <h2 className="mb-2 text-sm font-semibold text-slate-300">曲を選ぶ</h2>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {songs.map((song) => (
-            <button
-              key={song.id}
-              onClick={() => setSelectedId(song.id)}
-              className={[
-                "rounded-xl border px-4 py-3 text-left transition-colors",
-                song.id === selectedId
-                  ? "border-sky-400 bg-sky-500/10"
-                  : "border-slate-800 bg-slate-900 active:bg-slate-800",
-              ].join(" ")}
-            >
-              <div className="font-semibold">{song.title}</div>
-              <div className="text-xs text-slate-400">{song.subtitle}</div>
-            </button>
+        <div className="flex flex-col gap-4">
+          {groupedSongs.map((group) => (
+            <div key={group.category}>
+              <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {group.label}
+              </h3>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {group.songs.map((song) => (
+                  <button
+                    key={song.id}
+                    onClick={() => setSelectedId(song.id)}
+                    className={[
+                      "rounded-xl border px-4 py-3 text-left transition-colors",
+                      song.id === selectedId
+                        ? "border-sky-400 bg-sky-500/10"
+                        : "border-slate-800 bg-slate-900 active:bg-slate-800",
+                    ].join(" ")}
+                  >
+                    <div className="font-semibold">{song.title}</div>
+                    <div className="text-xs text-slate-400">{song.subtitle}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
 
