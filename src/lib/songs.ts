@@ -149,36 +149,47 @@ export const SONGS: Song[] = [
   ),
   buildSong(
     "fur-elise",
-    "Für Elise (Opening)",
+    "Für Elise",
     "ベートーヴェン・PD",
     100,
+    // A section (x2), the contrasting B section in C major, then A (x2)
+    // again - verified against a published ABC transcription rather than
+    // just repeating the famous opening bar.
     "E5:0.5 D#5:0.5 E5:0.5 D#5:0.5 E5:0.5 B4:0.5 D5:0.5 C5:0.5 " +
       "A4:1 R:0.5 C4:0.5 E4:0.5 A4:0.5 B4:1 R:0.5 " +
       "E4:0.5 G#4:0.5 B4:0.5 C5:1 R:0.5 E4:0.5 " +
+      "E5:0.5 D#5:0.5 E5:0.5 B4:0.5 D5:0.5 C5:0.5 " +
+      "A4:1 R:0.5 C4:0.5 E4:0.5 A4:0.5 B4:1 R:0.5 " +
+      "E4:0.5 C5:0.5 B4:0.5 A4:1 R:0.5 B4:0.5 C5:0.5 D5:0.5 " +
+      "E5:1.5 G5:0.5 F5:0.5 E5:0.5 D5:1.5 F5:0.5 E5:0.5 D5:0.5 " +
+      "C5:1.5 E5:0.5 D5:0.5 C5:0.5 B4:1 R:1 E4:1 " +
+      "E5:1 R:1 E5:1 E6:1 R:0.5 D#5:0.5 E5:0.5 D#5:0.5 " +
       "E5:0.5 D#5:0.5 E5:0.5 D#5:0.5 E5:0.5 B4:0.5 D5:0.5 C5:0.5 " +
       "A4:1 R:0.5 C4:0.5 E4:0.5 A4:0.5 B4:1 R:0.5 " +
       "E4:0.5 G#4:0.5 B4:0.5 C5:1 R:0.5 E4:0.5 " +
-      "E5:0.5 D#5:0.5 E5:0.5 D#5:0.5 E5:0.5 B4:0.5 D5:0.5 C5:0.5 " +
+      "E5:0.5 D#5:0.5 E5:0.5 B4:0.5 D5:0.5 C5:0.5 " +
       "A4:1 R:0.5 C4:0.5 E4:0.5 A4:0.5 B4:1 R:0.5 " +
-      "E4:0.5 G#4:0.5 B4:0.5 C5:1 R:0.5 E4:0.5",
+      "E4:0.5 C5:0.5 B4:0.5 A4:3",
     "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 " +
       "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 " +
-      "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2"
+      "C3:3 G2:3 A2:3 E2:3 E2:3 A2:3 " +
+      "A2:2 E3:2 A2:2 E3:2 A2:2 E3:2 " +
+      "A2:2 E3:2 A2:2 E3:2 A2:4"
   ),
   buildSong(
     "canon-in-d",
     "Canon in D",
     "パッヘルベル・PD",
     88,
-    "F#4:1 E4:1 D4:1 C#4:1 B3:1 A3:1 B3:1 C#4:1 " +
-      "D4:1 C#4:1 B3:1 A3:1 G3:1 F#3:1 G3:1 A3:1 " +
-      "F#4:1 E4:1 D4:1 C#4:1 B3:1 A3:1 B3:1 C#4:1 " +
-      "D4:1 C#4:1 B3:1 A3:1 G3:1 F#3:1 G3:1 A3:1 " +
-      "F#4:1 E4:1 D4:1 C#4:1 B3:1 A3:1 B3:1 C#4:1 " +
-      "D4:1 C#4:1 B3:1 A3:1 G3:1 F#3:1 D4:3",
-    "D3:2 A2:2 B2:2 F#2:2 G2:2 D2:2 G2:2 A2:2 " +
-      "D3:2 A2:2 B2:2 F#2:2 G2:2 D2:2 G2:2 A2:2 " +
-      "D3:2 A2:2 B2:2 F#2:2 G2:2 D2:2 G2:2 D3:3"
+    // This is the actual first-violin melody line (not just a rhythmicized
+    // bass), taken from a published ABC transcription - the real tune, not
+    // an improvised stand-in.
+    "F#5:4 E5:4 D5:4 C#5:4 B4:4 A4:4 B4:4 C#5:4 " +
+      "D5:4 C#5:4 B4:4 A4:4 G4:4 F#4:4 G4:4 E4:4 " +
+      "D5:6",
+    "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4 " +
+      "D2:4 A2:4 B2:4 F#2:4 G2:4 D2:4 G2:4 A2:4 " +
+      "D2:6"
   ),
   buildSong(
     "fate-motif",
