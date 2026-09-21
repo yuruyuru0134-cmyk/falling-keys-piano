@@ -55,7 +55,11 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
   const finishedRef = useRef(false);
 
   const totalDuration = useMemo(
-    () => (notes.length ? notes[notes.length - 1].time + notes[notes.length - 1].duration : 1),
+    // Notes are sorted by start time, but with melody + harmony merged
+    // (hard mode) the note that starts last isn't necessarily the one that
+    // ends last - a sustained bass note can outlast a short melody note
+    // that started after it. Take the true max end time over all notes.
+    () => (notes.length ? Math.max(...notes.map((n) => n.time + n.duration)) : 1),
     [notes]
   );
   const countdownSeconds = settings.fallTime + 0.3;
@@ -110,6 +114,7 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
 
       if (!finishedRef.current && currentTime > totalDuration + 1.2) {
         finishedRef.current = true;
+        getAudioEngine().allNotesOff();
         const hitCount = judgedRef.current.filter((j) => j === "hit").length;
         const missCount = judgedRef.current.filter((j) => j === "miss").length;
         setHud((prev) => {

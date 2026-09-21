@@ -178,6 +178,26 @@ const PianoKeyboard = forwardRef<PianoKeyboardHandle, Props>(function PianoKeybo
   // lib/audio.ts) so a note can never drone forever even if the on-screen
   // "held" state here got out of sync.
 
+  // If this component unmounts while a finger is still down (very likely
+  // right when a fast/hard song ends mid-tap), release any pointer capture
+  // explicitly. Some browsers don't cleanly hand touch input back to the
+  // rest of the page when a captured element disappears mid-touch, which
+  // was leaving the next screen's buttons unresponsive to taps.
+  useEffect(() => {
+    const container = containerRef.current;
+    const pointers = activePointers.current;
+    return () => {
+      for (const pointerId of pointers.keys()) {
+        try {
+          container?.releasePointerCapture(pointerId);
+        } catch {
+          // already released / invalid - nothing to do
+        }
+      }
+      pointers.clear();
+    };
+  }, []);
+
   return (
     <div
       ref={containerRef}
