@@ -43,3 +43,20 @@ export function getActiveNotes(song: Song, difficulty: Difficulty) {
     }))
     .sort((a, b) => a.time - b.time);
 }
+
+/**
+ * The harmony/bass line, auto-played quietly in the background on
+ * difficulties where the player only controls the melody. A melody missed
+ * or fumbled by the player is otherwise just silence, which - especially
+ * for a song like Canon in D whose identity is largely its bass line -
+ * stops sounding like the actual piece at all. Not used on "hard", where
+ * the player plays the harmony themselves.
+ */
+export function getBackingNotes(song: Song, difficulty: Difficulty) {
+  const settings = DIFFICULTY_SETTINGS[difficulty];
+  if (settings.useFullArrangement) return [];
+  const speed = settings.speedMultiplier;
+  return song.harmony
+    .map((n) => ({ midi: n.midi, time: n.time / speed, duration: n.duration / speed }))
+    .sort((a, b) => a.time - b.time);
+}

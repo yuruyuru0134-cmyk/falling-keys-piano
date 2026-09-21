@@ -161,7 +161,12 @@ export default function StartScreen({ songs, onStart, onImportMidi, importError 
 
       <button
         disabled={!selected}
-        onClick={() => selected && onStart(selected, difficulty, instrument)}
+        onClick={() => {
+          // Needs to happen inside a real user-gesture handler for iOS to
+          // let the game's auto-played backing track make sound later.
+          getAudioEngine().unlock();
+          if (selected) onStart(selected, difficulty, instrument);
+        }}
         className="mt-2 w-full rounded-xl bg-sky-500 py-4 text-lg font-bold text-white shadow-lg shadow-sky-500/30 active:bg-sky-600 disabled:opacity-50"
       >
         スタート

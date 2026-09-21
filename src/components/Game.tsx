@@ -5,11 +5,15 @@ import PianoKeyboard, { PianoKeyboardHandle } from "./PianoKeyboard";
 import FallingNotesCanvas, { FallingNotesHandle, JudgedNote } from "./FallingNotesCanvas";
 import type { Song } from "@/lib/songs";
 import { DIFFICULTY_SETTINGS, type Difficulty } from "@/lib/theory";
-import { getActiveNotes, getDisplayRange } from "@/lib/range";
+import { getActiveNotes, getBackingNotes, getDisplayRange } from "@/lib/range";
 import { getAudioEngine, type InstrumentId } from "@/lib/audio";
 
 const MemoKeyboard = memo(PianoKeyboard);
 const MemoFalling = memo(FallingNotesCanvas);
+
+// Quiet enough to sit behind the player's own (louder) notes, but present
+// enough to actually carry the song's harmony/bass line.
+const BACKING_VELOCITY = 0.32;
 
 export type GameResult = {
   score: number;
@@ -41,12 +45,15 @@ function rankFor(accuracy: number): GameResult["rank"] {
 export default function Game({ song, difficulty, instrument, onExit, onFinish }: Props) {
   const settings = DIFFICULTY_SETTINGS[difficulty];
   const notes = useMemo(() => getActiveNotes(song, difficulty), [song, difficulty]);
+  const backingNotes = useMemo(() => getBackingNotes(song, difficulty), [song, difficulty]);
   const { low, high } = useMemo(() => getDisplayRange(song, difficulty), [song, difficulty]);
 
   const keyboardRef = useRef<PianoKeyboardHandle>(null);
   const fallingRef = useRef<FallingNotesHandle>(null);
   const judgedRef = useRef<JudgedNote[]>(notes.map(() => null));
   const heldMidiRef = useRef<Map<number, number>>(new Map()); // midi -> pointer count
+  // Indexed the same as backingNotes; tracks each backing note's auto-play state.
+  const backingStateRef = useRef<("pending" | "on" | "done")[]>(backingNotes.map(() => "pending"));
 
   const [hud, setHud] = useState({ score: 0, combo: 0, maxCombo: 0, hit: 0, miss: 0, wrong: 0 });
   const [progress, setProgress] = useState(0);
@@ -109,6 +116,22 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
         }));
       }
 
+      // Auto-play the harmony/bass line quietly in the background so the
+      // song still sounds like itself even when the player is only playing
+      // (or fumbling) the melody - otherwise a missed note is just silence.
+      const engine = getAudioEngine();
+      for (let i = 0; i < backingNotes.length; i++) {
+        const state = backingStateRef.current[i];
+        const n = backingNotes[i];
+        if (state === "pending" && currentTime >= n.time) {
+          engine.noteOn(n.midi, BACKING_VELOCITY);
+          backingStateRef.current[i] = "on";
+        } else if (state === "on" && currentTime >= n.time + n.duration) {
+          engine.noteOff(n.midi);
+          backingStateRef.current[i] = "done";
+        }
+      }
+
       fallingRef.current?.render(currentTime, judgedRef.current);
       setProgress(Math.min(1, Math.max(0, currentTime / totalDuration)));
 
@@ -137,7 +160,7 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notes, settings.hitWindow, totalDuration, countdownSeconds, paused]);
+  }, [notes, backingNotes, settings.hitWindow, totalDuration, countdownSeconds, paused]);
 
   function togglePause() {
     const s = stateRef.current;
