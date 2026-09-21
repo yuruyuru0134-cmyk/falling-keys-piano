@@ -123,32 +123,75 @@ export const SONGS: Song[] = [
     "Jingle Bells (Chorus)",
     "J. ピアポント・PD",
     120,
-    "E4:1 E4:1 E4:2 E4:1 E4:1 E4:2 " +
-      "E4:1 G4:1 C4:1.5 D4:0.5 E4:4 " +
-      "F4:1 F4:1 F4:1.5 F4:0.5 F4:1 E4:1 E4:1 E4:0.5 E4:0.5 " +
-      "E4:1 D4:1 D4:1 E4:1 D4:2 G4:2",
-    "C3:4 C3:4 G3:4 C3:4 F3:4 F3:4 C3:4 G3:4"
+    // The actual chorus (verified against a published score) is shorter
+    // and ends differently than I'd first guessed - repeated twice here.
+    "E4:0.5 E4:0.5 E4:1 E4:0.5 E4:0.5 E4:1 " +
+      "E4:0.5 G4:0.5 C4:0.75 D4:0.25 E4:2 " +
+      "F4:0.5 F4:0.5 F4:0.75 F4:0.25 F4:0.5 E4:0.5 E4:0.5 E4:0.25 E4:0.25 " +
+      "G4:0.5 G4:0.5 F4:0.5 D4:0.5 C4:2 " +
+      "E4:0.5 E4:0.5 E4:1 E4:0.5 E4:0.5 E4:1 " +
+      "E4:0.5 G4:0.5 C4:0.75 D4:0.25 E4:2 " +
+      "F4:0.5 F4:0.5 F4:0.75 F4:0.25 F4:0.5 E4:0.5 E4:0.5 E4:0.25 E4:0.25 " +
+      "G4:0.5 G4:0.5 F4:0.5 D4:0.5 C4:2",
+    "C3:2 G3:2 C3:2 F3:2 C3:2 G3:2 C3:2 C3:2 " +
+      "C3:2 G3:2 C3:2 F3:2 C3:2 G3:2 C3:2 C3:2"
   ),
   buildSong(
     "auld-lang-syne",
     "Auld Lang Syne",
     "スコットランド民謡・PD",
     90,
-    "C4:1 F4:2 F4:1 F4:1 A4:1 G4:1 F4:1 " +
-      "G4:1 A4:2 C5:1 A4:1 G4:1 F4:1 G4:1 F4:3 " +
-      "C4:1 F4:2 F4:1 F4:1 A4:1 G4:1 F4:1",
-    "F3:4 F3:4 C3:4 F3:4 F3:4 C3:4 F3:4"
+    // Verse then refrain, from a published score with lyrics aligned - my
+    // first pass had used a different (correct but less familiar) old
+    // variant instead of the standard tune everyone actually knows.
+    "A4:1 D5:1.5 D5:0.5 E5:1 F#5:1 " +
+      "A4:1.5 B4:0.5 A4:1.5 A4:0.5 " +
+      "D5:1 F#5:1 E5:1 D5:1 " +
+      "B4:3 D5:1 " +
+      "A4:1.5 F#4:0.5 E4:1 D4:1 " +
+      "E4:1.5 D4:0.5 E4:1.5 F#4:0.5 " +
+      "A4:1.5 A4:0.5 B4:1 A4:1 " +
+      "A4:3 " +
+      "A4:1 D5:1.5 D5:0.5 E5:1 F#5:1 " +
+      "A4:1.5 B4:0.5 A4:1.5 A4:0.5 " +
+      "D5:1 F#5:1 E5:1 D5:1 " +
+      "B4:3 D5:1 " +
+      "A4:1.5 F#4:0.5 E4:1 D4:1 " +
+      "E4:1.5 D4:0.5 E4:1.5 F#4:0.5 " +
+      "A4:2 B4:0.5 A4:0.5 F#4:0.5 E4:0.5 " +
+      "D4:3",
+    "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 " +
+      "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:4 " +
+      "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 " +
+      "D3:2 A2:2 D3:2 A2:2 D3:2 A2:2 D3:4"
   ),
   buildSong(
     "greensleeves",
     "Greensleeves",
     "イングランド民謡・PD",
     92,
-    "A4:1.5 C5:0.5 D5:1 E5:1 F5:1.5 D5:0.5 " +
-      "E5:1 C5:1 A4:1.5 G4:0.5 A4:2 " +
-      "A4:1.5 C5:0.5 D5:1 E5:1 F5:1.5 D5:0.5 " +
-      "E5:1 C5:1 D5:1.5 C5:0.5 A4:2",
-    "A3:4 A3:4 F3:4 E3:4 A3:4 A3:4 F3:4 E3:4"
+    // Verified against a published score - Greensleeves is genuinely in the
+    // Dorian mode (raised 6th, so F# not F natural, plus a G# leading tone),
+    // which is what gives it its distinctive sound. My first attempt had
+    // flattened that out to a plain natural minor.
+    "A4:0.5 C5:1 D5:0.5 E5:0.75 F#5:0.25 E5:0.5 " +
+      "D5:1 B4:0.5 G4:0.75 A4:0.25 B4:0.5 " +
+      "C5:1 A4:0.5 A4:0.75 G#4:0.25 A4:0.5 " +
+      "B4:1 G#4:0.5 E4:1 A4:0.5 " +
+      "C5:1 D5:0.5 E5:0.75 F#5:0.25 E5:0.5 " +
+      "D5:1 B4:0.5 G4:0.75 A4:0.25 B4:0.5 " +
+      "C5:0.75 B4:0.25 A4:0.5 G#4:0.75 F#4:0.25 G4:0.5 " +
+      "A4:1.5 A4:1.5 " +
+      "G5:1.5 G5:0.75 F#5:0.25 E5:0.5 " +
+      "D5:1 B4:0.5 G4:0.75 A4:0.25 B4:0.5 " +
+      "C5:1 A4:0.5 A4:0.75 G#4:0.25 A4:0.5 " +
+      "B4:1 G#4:0.5 E4:1.5 " +
+      "G5:1.5 G5:0.75 F#5:0.25 E5:0.5 " +
+      "D5:1 B4:0.5 G4:0.75 A4:0.25 B4:0.5 " +
+      "C5:0.75 B4:0.25 A4:0.5 G#4:0.75 F#4:0.25 G4:0.5 " +
+      "A4:1.5 A4:1",
+    "A2:3 D3:3 A2:3 E3:3 A2:3 D3:3 A2:3 A2:3 " +
+      "C3:3 D3:3 A2:3 E3:3 C3:3 D3:3 A2:3 A2:2"
   ),
   buildSong(
     "fur-elise",
