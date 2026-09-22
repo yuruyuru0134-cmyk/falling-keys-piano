@@ -12,8 +12,10 @@ const MemoKeyboard = memo(PianoKeyboard);
 const MemoFalling = memo(FallingNotesCanvas);
 
 // Quiet enough to sit behind the player's own (louder) notes, but present
-// enough to actually carry the song's harmony/bass line.
-const BACKING_VELOCITY = 0.32;
+// enough to actually carry the song's harmony/bass line - some pieces
+// (Canon in D especially) are only really recognizable *because* of the
+// bass progression, so this needs to be clearly audible, not just a hint.
+const BACKING_VELOCITY = 0.55;
 
 export type GameResult = {
   score: number;
@@ -229,7 +231,10 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-slate-950 text-slate-100">
+    <div
+      className="game-screen flex h-full w-full flex-col overscroll-none bg-slate-950 text-slate-100"
+      style={{ touchAction: "none" }}
+    >
       <div className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
         <button
           onClick={() => {
