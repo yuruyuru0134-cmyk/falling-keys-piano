@@ -267,6 +267,11 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
     <div
       className="game-screen flex h-full w-full flex-col overscroll-none bg-slate-950 text-slate-100"
       style={{ touchAction: "none" }}
+      // JS-level fallback that works the same on every browser/OS (not just
+      // iOS): blocks the long-press/right-click context menu and image drag
+      // so neither can interrupt a held note.
+      onContextMenu={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
     >
       <div className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
         <button

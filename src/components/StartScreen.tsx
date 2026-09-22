@@ -165,6 +165,17 @@ export default function StartScreen({ songs, onStart, onImportMidi, importError 
           // Needs to happen inside a real user-gesture handler for iOS to
           // let the game's auto-played backing track make sound later.
           getAudioEngine().unlock();
+          // Hides the browser chrome (address bar etc.) on browsers that
+          // support it (Android Chrome, desktop, ...) so there's less edge
+          // of screen for an accidental swipe to reveal it mid-song. iOS
+          // Safari doesn't support this for arbitrary elements - it's a
+          // no-op there, not an error.
+          type FullscreenEl = HTMLElement & {
+            webkitRequestFullscreen?: () => Promise<void> | void;
+          };
+          const el = document.documentElement as FullscreenEl;
+          const request = el.requestFullscreen?.bind(el) ?? el.webkitRequestFullscreen?.bind(el);
+          request?.()?.catch?.(() => {});
           if (selected) onStart(selected, difficulty, instrument);
         }}
         className="mt-2 w-full rounded-xl bg-sky-500 py-4 text-lg font-bold text-white shadow-lg shadow-sky-500/30 active:bg-sky-600 disabled:opacity-50"

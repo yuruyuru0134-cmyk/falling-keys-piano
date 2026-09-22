@@ -56,6 +56,13 @@ export default function Home() {
 
   const allSongs = [...SONGS, ...customSongs];
 
+  useEffect(() => {
+    if (view !== "menu") return;
+    const doc = document as Document & { webkitExitFullscreen?: () => Promise<void> | void };
+    if (!doc.fullscreenElement) return;
+    (doc.exitFullscreen?.() ?? doc.webkitExitFullscreen?.())?.catch?.(() => {});
+  }, [view]);
+
   function handleStart(s: Song, d: Difficulty, i: InstrumentId) {
     setSong(s);
     setDifficulty(d);
