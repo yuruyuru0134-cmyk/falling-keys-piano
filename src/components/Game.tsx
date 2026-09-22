@@ -81,6 +81,39 @@ export default function Game({ song, difficulty, instrument, onExit, onFinish }:
     stateRef.current.startPerf = performance.now();
   }, []);
 
+  // Keep the screen from auto-dimming/locking mid-song (iOS 16.4+, and most
+  // other modern browsers). The lock is released by the OS whenever the tab
+  // is hidden, so it has to be re-requested on return, not just once.
+  useEffect(() => {
+    let sentinel: WakeLockSentinel | null = null;
+    let cancelled = false;
+    async function acquire() {
+      if (!("wakeLock" in navigator)) return;
+      try {
+        const lock = await (navigator as Navigator & { wakeLock: WakeLock }).wakeLock.request(
+          "screen"
+        );
+        if (cancelled) {
+          lock.release().catch(() => {});
+        } else {
+          sentinel = lock;
+        }
+      } catch {
+        // Not fatal - e.g. low battery mode can refuse this.
+      }
+    }
+    acquire();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") acquire();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibility);
+      sentinel?.release().catch(() => {});
+    };
+  }, []);
+
   useEffect(() => {
     getAudioEngine().setInstrument(instrument);
   }, [instrument]);
